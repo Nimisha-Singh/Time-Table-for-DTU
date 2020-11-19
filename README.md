@@ -148,9 +148,6 @@ An example `departments.csv` file is provided in the `data` folder.
 ##### Courses
 A list of courses is also available on the same page as the departments. This list will be available in the following format.
 
-```
-<option value="GA_KSOFT_7GM36SOF7">G-KSOFG73 BSc in Computing in Software Development L7 Yr 3 Sem 6</option>
-```
 
 Converting this list to a CSV file isn't as straight forward as there is no link between the department and course. I then copied them to different files called `dept-n.txt` and used the Brackets editor to remove the option tags and `&amp;` codes from the files. Then, using a python script I was able to combine these files into a single `courses.csv` file, using the department name from the `departments.csv` file created earlier. This file can then be loaded into Neo4J. To run this script go to the `data/courses` using a terminal and run `python course-parser.py`. Example files are provided.
 
