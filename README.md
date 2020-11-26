@@ -1,34 +1,17 @@
 # Graph-Theory-Project
 
-This document is divided into seven sections
-1. [Introduction](#s1)
-2. [Understanding the problem](#s2)
-3. [Understanding Neo4J](#s3)
-4. [Finding a solution](#s4)
-5. [Building the prototype](#s5)
-6. [Using the system](#s6)
-7. [Conclusion](#s7)
 
 ### <a id="s1"></a>Introduction
 This is my 4th year graph theory project. For this project I was required to design a database for a timetabling system for our university. The database stores data about student groups, classrooms, lecturers, work hours and other data relating to timetables. This is the design document for the project.
 ### <a id="s2"></a>Understanding the problem
-The timetabling problem, in its simplest form, is trying to allocate shared resources to a given timeslot. These resources include lecturers, rooms and student groups. These resources are limited and must be scheduled in such a way that they are uniquely allocated per timeslot, meaning a lecturer can only teach one class at a time, a student group can only attend one class at a time and a room can only be used for a single class at a time. The more resources that must be scheduled the more difficult this problem gets.
+The timetabling problem, in its simplest form, is trying to allocate shared resources to a given timeslot. These resources include lecturers, rooms and student groups. These resources are limited and must be scheduled in such a way that they are uniquely allocated per timeslot.
 
-#### Resource constraints
-This problem gets more difficult when considering the constraints on each resource.
-
-+ Lecturers have work hours which means they can teach a limited amount of classes per week.
-+ Rooms have a capacity meaning student groups should be assigned to appropriately sized rooms.
-+ Some classes may require extra equipment which will also determine what room they will be allocated.
-+ Student groups and lecturers need breaks between a certain number of classes.
-
-All these factors make it very difficult to find a solution to the timetabling problem.
 
 ### <a id="s3"></a>Understanding Neo4J
 Before trying to solve the timetabling problem it is important to first understand Neo4J and how it works.
 
 #### What is Neo4J?
-[Neo4J](https://neo4j.com/) is a graph database management system. Graph databases are catagorised as NoSQL, or not only SQL, databases. Unlike relational databases, NoSQL databases do not follow a set schema. This allows the data to be more flexible. Graph databases are particularly useful for storing connections, or relationships, between data.
+[Neo4J](https://neo4j.com/) is a graph database management system. Unlike relational databases, NoSQL(Not only SQL) databases do not follow a set schema. This allows the data to be more flexible. Graph databases are particularly useful for storing connections, or relationships, between data.
 
 #### How does Neo4J store data?
 All data in a Neo4J database is represented as one of the following five structures:
@@ -49,18 +32,9 @@ All data in a Neo4J database is represented as one of the following five structu
 	
 	Properties are key-value pairs that store data in nodes and relationships. As mentioned before, Neo4J is schemaless, therefore each node or relationship can have different properties even if they have the same labels or relationship types. Properties are similar to columns in relational databases.
 
-### <a id="s4"></a>Finding a solution
 
-#### What functionality is required?
-Before developing a solution, its important to define what functionality this system should offer. The following is a list of proposed features for such a system.
 
-+ Show the timetable for a course.
-+ Show the timetable for a lecturer.
-+ Show the current working hours for a lecturer.
-+ Show the timetable for a room.
-+ Show appropriate sized rooms available at a given time.
 
-These features must be considered when modeling this problem with Neo4J.
 
 #### What data needs to be stored?
 Analysing both the problem, and the current GMIT timetabling system, helped determine what data this system needs to store. A brief break down is given below.
@@ -111,59 +85,19 @@ Before trying to solve this problem I researched solutions and techniques propos
 
 In this graph the vertices could represent classes. The edges could represent conflicts between classes. For example, if two classes share the same room, student group or lecturer. The colours could represent the timeslot in which that particular class is scheduled for. When constructing the timetable graph we know that in order to avoid a conflict we must not connect two nodes of the same colour. The maximum amount of colours the graph can have in this case is equal to the number of timeslots available in a week.
 
-Other areas of interest were Tabu Search and Genetic Algorithm. However, these were not applicable when working with Neo4J.
-
-#### Using graph theory to model this problem
-Before starting the design it's important to be aware of the type of data thats being handled and how this system will be used. Generally, timetabling systems are updated seldom, usually one major write is made at the beginning of each semester and some minor adjustments might be made throughout the semester. However, the data will be read frequently so queries that read data must be efficient. Also, the queries that will be run on the data must be kept in mind. The first solution that came to mind was to design the graph as follows.
-
-In this solution the direction would be used to indicate a resource that is ALLOCATED TO a class. This design was influenced by the graph colouring solution. The simplicity of this approach would offer a lot of flexibility, for example, it doesn't restrict more than one lecturer from teaching the same module. This design would also make querying student, lecturer and room timetables very easy as only adjacent Class nodes will make up their timetable as those are the only classes they are allocated to. However, this design is flawed as it ignores a lot of data which needs to be stored such as courses and departments. Although this solution was not used, it was a good starting point thst helped clarify the relationships between the data which ultimately aided in the design of the final solution.
-
-Given the list of data given above that needs to be stored, it seems intuitive to make each bullet point a label in the graph and the data in the paragraphs properties of those nodes. Therefore, there would be ten labels which are COLLEGE, CAMPUS, ROOM, DEPARTMENT, COURSE, MODULE, YEAR_GROUP, STUDENT_GROUP, LECTURER and CLASS.
-
-Then the problem emerges how to connect or relate these nodes to each other. This is less straight forward. When designing the graph I started with the college node and worked down to the class nodes. However, after some trial and error I began to rethink this design and eventually came up with the solution shown in the following diagram.
-
-This design would utilise all of the data structures offered by Neo4J. It is designed to be flexible and to reduce duplicate and redundant data. A few of the design decisions made included:
-
-+ Making the student group a property of a class node rather than a node itself as it would make querying timetables more difficult.
-+ Creating a relationship between the lecturers and modules rather than the classes to avoid redundant relationships.
-+ The semester property in the module node refers to the current semester for the college year, not the semester for the year group as this can be deduced from the year and semester properties.
-+ The days on which the classes are sheduled are stored as numbers, where 1 represents Monday and so on.
-+ The times for which the classes are sheduled are stored as numbers in a 24 hour format.
-
-This is still a relatively simple design but it stores all the crucial data while remaining easy to understand.
-
-### <a id="s5"></a>Building the prototype
-Now that the database design is complete a prototype database can be built to demonstrate how it might be used. Note that this database will be stored at `/var/lib/neo4j/data/graph.db` in Linux.
-
-#### Obtaining the data
-To populate the prototype database, data is needed. Finding and extracting this data was more difficult than anticipated due to the implementation of GMIT's current timetabling system from which most of the data was extracted. In order to properly test this database design I tried to accumulate as much data as possible. However, this is only test data. It is not 100% complete and may contain minor errors.
 
 
-The data for each room is within a pair of opening and closing option tags. The first series of characters are a campus identifier and room number combination. The second set of data is the room name. At the end, within the round brackets, is the rooms capacity. After copying the list of rooms to a file I opened it with the Brackets editor which has a replace function that takes a regular expression. Using this feature I was able to remove the HTML option tags with the regular expression `<[^>]*>`. Once the file was in this format I used a Python script to parse it and write the data to a CSV file. This script takes a file called `rooms.txt` as an input and outputs a file called `rooms.csv` which can be loaded into Neo4J.
-
-To run this script go to the `data/rooms` folder in a terminal and run `python room-parser.py`. Example files are provided.
-
-An example `departments.csv` file is provided in the `data` folder.
-
-##### Courses
-A list of courses is also available on the same page as the departments. This list will be available in the following format.
-
-
-Converting this list to a CSV file isn't as straight forward as there is no link between the department and course. I then copied them to different files called `dept-n.txt` and used the Brackets editor to remove the option tags and `&amp;` codes from the files. Then, using a python script I was able to combine these files into a single `courses.csv` file, using the department name from the `departments.csv` file created earlier. This file can then be loaded into Neo4J. To run this script go to the `data/courses` using a terminal and run `python course-parser.py`. Example files are provided.
-
-##### Other data
-Unfortunately, all the other data was too difficult to automatically obtain due to inconsistencies such as room and module names. Instead I manually created small datasets for the lecturers, modules and classes from data obtained from both the timetabling website. I transformed this data into CSV format using the Brackets editor with the help regular expressions. This data relates only to the BSc in Computing in Software Development L7 course. These files are all within the `data` folder.
 
 #### Adding the data to the database
-Once the data is obtained we can start storing it in the prototype database. This section will involve importing the CSV files created earlier into the Neo4J database. If you are using Linux you must copy these CSV files into a folder found at `/usr/share/neo4j/import` to be able to import them into the database. Note that running the following queries will create a replica of the database provided in this repository.
+Once the data is obtained we can start storing it in the prototype database. This section will involve importing the CSV files created earlier into the Neo4J database. 
 
-The first node that needs to be created is the college node. The following query will create a single college node with a single property called name with the value 'GMIT'.
+The first node that needs to be created is the college node. The following query will create a single college node with a single property called name with the value 'DTU'.
 
 ```
 CREATE (c:College {name: "DTU"});
 ```
 
-Next create the room and campus nodes from the `rooms.csv` file created earlier, as shown below. This query first loads the `rooms.csv` file from the `import` folder. This file is read line by line, using the alias `line` to reference the current line of data. To retrieve data from the CSV file use the alias `line` and the column header, separated by a period. For each line we use the `MERGE` keyword to create a room node, with the name and capacity specified in the current line of the CSV file, if it does not already exist. We do the same for the campus nodes and the relationship between the campus and the room nodes.
+Next create the room and campus nodes from the `rooms.csv` file, as shown below. This query first loads the `rooms.csv` file from the `import` folder.
 
 ```
 LOAD CSV WITH HEADERS FROM "file:///rooms.csv" AS line
@@ -179,7 +113,7 @@ MATCH (col:College {name: "DTU"}), (c:Campus)
 CREATE (col)-[:HAS]->(c);
 ```
 
-Next, we'll create the department nodes and the relationships between the new departments and the campus nodes to which they belong. This data will be loaded from the `departments.csv` file, similar as to how the room data was loaded. Again, using the `MERGE` keyword, create the department and campus nodes if they do not already exist. Then create a relationship between them.
+Next, we'll create the department nodes and the relationships between the new departments and the campus nodes to which they belong. This data will be loaded from the `departments.csv` file. Again, using the `MERGE` keyword, create the department and campus nodes if they do not already exist. Then create a relationship between them.
 
 ```
 LOAD CSV WITH HEADERS FROM "file:///departments.csv" AS line
@@ -188,8 +122,7 @@ MERGE (c:Campus { name: line.campus })
 MERGE (c)-[:HAS]->(d);
 ```
 
-Using a similar query to the one above we can create all course and year group nodes. This is a slightly longer query as the `courses.csv` contains a lot of different data. First, `USING` the match keyword, find the department node with a name value that matches the department column in the line of data. Next, using `MERGE`, check if a course node with the given course code exists. If not, create it. Then set the properties title and level. It's important to set these after using merge and not in it as some courses might have the same course code but a different title or level, which would lead to duplicate courses. Next, create a year group node. Finally, create a relationship between the department and course and course and year group nodes.
-
+Using a similar query to the one above we can create all course and year group nodes. This is a slightly longer query as the `courses.csv` contains a lot of different data. First, `USING` the match keyword, find the department node with a name value that matches the department column in the line of data. Next, using `MERGE`, check if a course node with the given course code exists. If not, create it. Then set the properties title and level. 
 ```
 LOAD CSV WITH HEADERS FROM "file:///courses.csv" AS line
 MATCH (d:Department { name: line.department })
@@ -201,7 +134,7 @@ MERGE (c)-[:ENROLLS]->(y:Year_Group { year_code: line.year_code })
 SET y.year = toInteger(line.year);
 ```
 
-Next create the lecturers for the Computer Science and Applied Physics department, using the data from the `lecturers.csv` file, as shown below.
+Next create the lecturers for the Mathematics and Computing department, using the data from the `lecturers.csv` file, as shown below.
 
 ```
 LOAD CSV WITH HEADERS FROM "file:///lecturers.csv" AS line
@@ -234,28 +167,13 @@ MERGE (m)-[:SUBJECT_OF]->(cl)
 MERGE (r)-[:HOSTS]->(cl);
 ```
 
-Use the following query to view the entire graph. The first line increases the limit of nodes that are returned from the default 300 to 1000.
-
 ```
 :config initialNodeDisplay:1000
 MATCH (n)-[r]->(m) RETURN n, r, m;
 ```
 
-### <a id="s6"></a>Using the system
-Now that the prototype database contains all the test data we can use the following queries to retrieve useful data from it. This section will not include how to create data as that was covered in the previous section. Instead it will focus on the retrieval of data.
 
-##### Room timetable
-Find a room by name and return all the classes that are scheduled to be held in that room and the module which the class is for. Only return the classes that are run in the second semester of the year. The following query will return the timetable for the room with the name "0436 CR5".
-
-```
-MATCH (room:Room { name: "TW1-GF3" })-[hosts:HOSTS]->(class:Class)
-MATCH (module:Module { semester: 7 })-[subject_of:SUBJECT_OF]->(class:Class)
-RETURN room, class, module
-ORDER BY class.day, class.start;
-```
-
-Another important feature of a timetabling system was being able to display available rooms. The following query will find all room nodes with a capacity of at least 20 that are connected to a campus node with the name "Galway". If the room is connected to one or more class nodes ensure the room is only returned if it is not occupied at the given day and time, which in this case is Wednesday from 10 to 11. This query will only check classes that are on during the second semester of the year. Becasue rooms are a limited resource it's import to return the rooms that are a best fit. To achieve this, return the rooms in order of capacity.
-
+Another important feature of a timetabling system was being able to display available rooms. The following query will find all room nodes with a capacity of at least 20 that are connected to a campus node with the name "Incline Wing". If the room is connected to one or more class nodes ensure the room is only returned if it is not occupied at the given day and time
 ```
 MATCH (campus:Campus { name: "DEPARTMENT1" })-[r]->(room:Room)
 WHERE room.capacity >= 20
@@ -269,32 +187,8 @@ RETURN DISTINCT room
 ORDER BY room.capacity;
 ```
 
-This will return all rooms except room 0938 as there is a graph theory lecture on in that room at the given day and time.
 
-##### Year group timetable
-Get the year group by first finding a course by course code and then get the year group by entering the year. Return the year, the class and modules the year studies and the rooms in which the classes take place. Only return the timetable for the second semester of the year. For example, the following query will retrieve the 3rd year BSc in Computing in Software Development L7 timetable.
-
-```
-MATCH (course:Course { course_code: "KSOFG" })-[r1:ENROLLS]->(year:Year_Group { year: 3 })
-MATCH (year)-[studies:STUDIES]->(module:Module { semester: 2 })
-MATCH (module)-[subject_of:SUBJECT_OF]->(class:Class)
-MATCH (room:Room)-[hosts:HOSTS]->(class:Class)
-RETURN year, module, class, room
-ORDER BY class.day, class.start;
-```
-
-##### Lecturer timetable
-Find a lecturer by name and return all the classes they teach, the module to which that class is for and the room it is in. Only return the timetable for the second semester of the year. Order the results by day and time. The following query will return the timetable for the lecturer Ian McLoughlin. As mentioned earlier, using a staff Id would be more suitable for this query as two lecturers could share the same name, but staff Id's not available.
-
-```
-MATCH (lecturer:Lecturer { name: "Payal Ma'am" })-[teaches:TEACHES]->(module:Module { semester: 7 })
-MATCH (module)-[subject_of:SUBJECT_OF]->(class:Class)
-MATCH (room:Room)-[hosts:HOSTS]->(class)
-RETURN lecturer, module, class
-ORDER BY class.day, class.start;
-```
-
-To get the lecturers weekly working hours we can use a similar query and change the return statement as shown below.
+To get the lecturers weekly working hours we can use a similar query and change the return statement
 
 ```
 MATCH (lecturer:Lecturer { name: "Payal Ma'am" })-[teaches:TEACHES]->(module:Module { semester: 7 })
@@ -303,12 +197,9 @@ MATCH (room:Room)-[hosts:HOSTS]->(class)
 RETURN SUM(class.end - class.start) AS working_hours;
 ```
 
-### <a id="s7"></a>Conclusion
-The timetabling problem proved to be a very difficult problem to find an efficient solution to due to the high level of constraints and connectivity within the data and its non-linear nature. After completing this project I now see why graph theory is a suitable candidate for modeling such a problem.
 
-This project provided an opportunity to learn more about Neo4J and graph databases in general. It allowed me to experiment with different techniques for designing a graph database, creating data in Neo4J and writing cypher queries. I now realise how important it is to choose an appropriate data structure when deciding how to store data. I found the Neo4J web interface very useful for visualising the data when testing queries.
-
-If I was to do this project again I would like to research more about design patterns for graph databases and how to optimise a Neo4J database to improve performance especially when working with larger datasets.
+Dataset:
+https://drive.google.com/drive/folders/1erwiKGPnmvC90bMvAK3oXS-kE5yLnljn?usp=sharing
 
 References:
 + [Neo4J](https://neo4j.com/)
@@ -316,5 +207,3 @@ References:
 + [Cypher cheat sheet](http://semanticommunity.info/@api/deki/files/25765/Neo4j_CheatSheet_v3.pdf)
 + [Importing CSV files with Cypher](https://neo4j.com/docs/developer-manual/current/get-started/cypher/importing-csv-files-with-cypher/)
 + [Importing CSV files containing array](https://dzone.com/articles/neo4j-load-csv-processing)
-+ [GMIT timetable website](http://timetable.gmit.ie/)
-+ [Gravizo was used to draw graphs](https://g.gravizo.com/)

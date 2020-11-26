@@ -13,19 +13,19 @@ out.writerow(headerRow)
 
 for room in rooms:
     # campus
-    campus_id_length = 4
+    campus_id_length = 10
     
     if re.search('G', room[:1], re.IGNORECASE):
-        campus = 'Galway'
+        campus = 'DTU'
         campus_id_length = 1
-    elif re.search('MAYO', room[:campus_id_length], re.IGNORECASE):
-        campus = 'Mayo'
-    elif re.search('LETT', room[:campus_id_length], re.IGNORECASE):
-        campus = 'Letterfrack'
-    elif re.search('CCAM', room[:campus_id_length], re.IGNORECASE):
-        campus = 'Centre for Creative Arts & Media'
-    elif re.search('NUIG', room[:campus_id_length], re.IGNORECASE):
-        campus = 'NUIG'
+    elif re.search('Technical Wing', room[:campus_id_length], re.IGNORECASE):
+        campus = 'DTU'
+    elif re.search('Lecturer Wing', room[:campus_id_length], re.IGNORECASE):
+        campus = 'DTU'
+    elif re.search('SPS', room[:campus_id_length], re.IGNORECASE):
+        campus = 'DTU'
+    elif re.search('Inclined Wing', room[:campus_id_length], re.IGNORECASE):
+        campus = 'DTU'
     else:
         campus = 'Unknown'
         campus_id_length = 0
