@@ -201,6 +201,9 @@ RETURN SUM(class.end - class.start) AS working_hours;
 Dataset:
 https://drive.google.com/drive/folders/1erwiKGPnmvC90bMvAK3oXS-kE5yLnljn?usp=sharing
 
+Report:
+https://docs.google.com/document/d/1tpV_D-erm9IknclqT9zu7-IGCYh5pz7XnBS4aRgx7yE/edit
+
 References:
 + [Neo4J](https://neo4j.com/)
 + [Graph colouring on Wikipedia](https://en.wikipedia.org/wiki/Graph_coloring)
