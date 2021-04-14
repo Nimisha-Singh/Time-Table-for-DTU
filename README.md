@@ -37,7 +37,7 @@ All data in a Neo4J database is represented as one of the following five structu
 
 
 #### What data needs to be stored?
-Analysing both the problem, and the current GMIT timetabling system, helped determine what data this system needs to store. A brief break down is given below.
+Analysing both the problem, and the current DTU timetabling system, helped determine what data this system needs to store. A brief break down is given below.
 
 + College
     
