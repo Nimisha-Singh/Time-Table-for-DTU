@@ -143,7 +143,7 @@ MERGE (d:Department { name: line.department })
 MERGE (d)-[:EMPLOYS]->(l);
 ```
 
-Create modules for the BSc in Computing in Software Development course, using the data from the `modules.csv` file. This file contains an array of lecturer names which will have to be handled. To do this, first use substring to remove the square brackets. Next, split the array using a comma as a delimiter. Then, use the `UNWIND` keyword to separate the array into multiple rows of data. Next, use `MATCH` to find the course using the `course_code` property and from that find the 3rd year node. Create the new module node and a relation between the year group and it. Finally, create a `TEACHES` relationship between the lecturer and module. Note that it is not a good idea to find the lecturer by name as more than one lecturer might have that name, however, staff Id's were not available when obtaining the data.
+Create modules for the Mathematics and Computing, using the data from the `modules.csv` file. This file contains an array of lecturer names which will have to be handled. To do this, first use substring to remove the square brackets. Next, split the array using a comma as a delimiter. Then, use the `UNWIND` keyword to separate the array into multiple rows of data. Next, use `MATCH` to find the course using the `course_code` property and from that find the 3rd year node. Create the new module node and a relation between the year group and it. Finally, create a `TEACHES` relationship between the lecturer and module. Note that it is not a good idea to find the lecturer by name as more than one lecturer might have that name, however, staff Id's were not available when obtaining the data.
 
 ```
 LOAD CSV WITH HEADERS FROM "file:///modules.csv" AS line
